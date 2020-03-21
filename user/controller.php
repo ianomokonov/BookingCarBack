@@ -1,5 +1,9 @@
 <?php
 //прием запросов с клиента
+header("Access-Control-Allow-Origin: *"); 
+header("Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token , Authorization");
+
 include_once 'repository.php';
 
 $repository = new UserRepository();
@@ -28,7 +32,7 @@ if(isset($_GET['key'])){
             break;
         case 'refresh-token':
             if(isset($_GET['token'])){
-                // $repository->GetUser($_GET['token']);
+                // TODO если будем делать денамические кодовые слова
                 return;
             }
 

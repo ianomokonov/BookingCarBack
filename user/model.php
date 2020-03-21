@@ -15,4 +15,15 @@
         public $email;
         public $password;
     }
+
+    class UserResponse{
+        public $token;
+        public $user;
+
+        public function __construct(string $token, User $user)
+        {
+            $this->token = $token;
+            $this->user = $user;
+        }
+    }
 ?>
