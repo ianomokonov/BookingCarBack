@@ -32,7 +32,7 @@ if(isset($_GET['key'])){
             break;
         case 'refresh-token':
             if(isset($_GET['token'])){
-                // TODO если будем делать денамические кодовые слова
+                // TODO если будем делать динамические кодовые слова
                 return;
             }
 
