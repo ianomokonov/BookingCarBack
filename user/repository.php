@@ -90,10 +90,10 @@
             $user = $this->GetUserById($user->id);
 
             if($user){
-                return $user;
+                return new UserResponse($this->jwt->encode($user), $user, "Вход выполнен");
             } else {
                 http_response_code(400);
-                return array("message" => "Пользователь не найден");
+                return array("message" => "Ошибка входа");
             }
         }
 
