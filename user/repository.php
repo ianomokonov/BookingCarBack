@@ -27,7 +27,7 @@
                     $s->execute(array($user->name, $user->email, $user->password, $user->phone));
                     $fullUser = $this->GetUserById($this->database->db->lastInsertId());
                     if($fullUser){
-                        return new UserResponse($this->jwt->encode($fullUser), $fullUser);
+                        return new UserResponse($this->jwt->encode($fullUser), $fullUser, "Пользователь зарегистрирован");
                     } else {
                         http_response_code(400);
                         return array("message" => "Ошбка добавления пользователя");
@@ -57,7 +57,7 @@
                             return array("message" => "Неверный пароль");
                         }
                         unset($fullUser->password);
-                        return new UserResponse($this->jwt->encode($fullUser), $fullUser);
+                        return new UserResponse($this->jwt->encode($fullUser), $fullUser, "Вход выполнен");
                     } else {
                         http_response_code(400);
                         return array("message" => "Пользователь не найден");

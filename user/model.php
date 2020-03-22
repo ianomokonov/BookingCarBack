@@ -37,11 +37,13 @@
     class UserResponse{
         public $token;
         public $user;
+        public $message;
 
-        public function __construct(string $token, User $user)
+        public function __construct(string $token, User $user, string $message)
         {
             $this->token = $token;
             $this->user = $user;
+            $this->message = $message;
         }
     }
 ?>
