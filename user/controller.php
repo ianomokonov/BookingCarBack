@@ -13,12 +13,12 @@ if(isset($_GET['key'])){
         case 'sign-in':
             $data = json_decode(file_get_contents("php://input"));
             http_response_code(200);
-            echo json_encode($repository->SignIn($data));
+            echo json_encode($repository->SignIn(AddUser::getInstanse($data)));
             break;
         case 'log-in':
             $data = json_decode(file_get_contents("php://input"));
             http_response_code(200);
-            echo json_encode($repository->LogIn($data));
+            echo json_encode($repository->LogIn(LoginUser::getInstanse($data)));
             break;
         case 'get-user':
             if(isset($_GET['token'])){
@@ -39,6 +39,8 @@ if(isset($_GET['key'])){
             http_response_code(401);
             echo json_encode(array("message" => "Доступ запрещён."));
             break;
+        default: 
+            echo json_encode(array("message" => "Неверный ключ запроса"));
     }
 } else {
     http_response_code(500);

@@ -1,11 +1,16 @@
 <?php
     // требуется для декодирования JWT 
+    include_once '../libs/JWT/JWT.php';
     use \Firebase\JWT\JWT;
 
     class Token{
     
         // переменные, используемые для JWT 
         private $key = "Hd31J34nH8k";
+        private $iss = "http://any-site.org";
+        private $aud = "http://any-site.com";
+        private $iat = 1356999524;
+        private $nbf = 1357000000;
 
         public function __construct()
         {
@@ -23,7 +28,7 @@
                     // декодирование jwt 
                     $decoded = JWT::decode($jwt, $this->key, array('HS256'));
             
-                    return $decoded->data;
+                    return $decoded;
             
                 }
             
@@ -53,10 +58,17 @@
         }
 
         public function encode($data){
+            $token = array(
+                "iss" => $this->iss,
+                "aud" => $this->aud,
+                "iat" => $this->iat,
+                "nbf" => $this->nbf,
+                "data" => $data
+             );
             
             try {
                 // декодирование jwt 
-                $token = JWT::encode($data, $this->key, array('HS256'));
+                $token = JWT::encode($data, $this->key);
         
                 return $token;
         
@@ -69,10 +81,10 @@
                 http_response_code(401);
             
                 // сообщить пользователю отказано в доступе и показать сообщение об ошибке 
-                echo array(
+                return json_encode(array(
                     "message" => "Ошибка создания токена.",
                     "error" => $e->getMessage()
-                );
+                ));
             }
         }
     }
