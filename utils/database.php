@@ -7,7 +7,6 @@
         public $db;
         public function __construct()
         {
-            //$this->db = new PDO('mysql:host=localhost;dbname=myblog;charset=UTF8','nlc','12345');
             $this->db = new PDO("mysql:host=localhost;dbname=".$this->dbname.";charset=UTF8", $this->login, $this->password);
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
         }
@@ -15,9 +14,9 @@
         public function genInsertQuery($ins, $t){
             $res = array('INSERT INTO '.$t.' (',array());
             $q = '';
-            for ($i = 0; $i < count(array_keys($ins)); $i++) {
-                $res[0] = $res[0].array_keys($ins)[$i].',';
-                $res[1][]=$ins[array_keys($ins)[$i]];
+            for ($i = 0; $i < count(array_keys((array)$ins)); $i++) {
+                $res[0] = $res[0].array_keys((array)$ins)[$i].',';
+                $res[1][]=$ins[array_keys((array)$ins)[$i]];
                 $q=$q.'?,';
                 
             }

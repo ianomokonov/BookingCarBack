@@ -23,10 +23,11 @@
                     }
                     unset($user->id);
                     $user->password = password_hash($user->password, PASSWORD_BCRYPT);
-                    $this->db->genInsertQuery($user, $this->base_table);
+                    $s = $this->database->db->prepare("INSERT INTO ".$this->base_table." (name, email, password, phone) VALUES (?,?,?,?)");
+                    $s->execute(array($user->name, $user->email, $user->password, $user->phone));
                     $fullUser = $this->GetUserById($this->database->db->lastInsertId());
                     if($fullUser){
-                        return new UserResponse($this->jwt->encode($fullUser), $fullUser);
+                        return new UserResponse($this->jwt->encode($fullUser), $fullUser, "Пользователь зарегистрирован");
                     } else {
                         http_response_code(400);
                         return array("message" => "Ошбка добавления пользователя");
@@ -45,12 +46,18 @@
         public function LogIn(LoginUser $user = null){
             if($user){
                 try{
-                    $sth = $this->database->db->prepare("SELECT id, name, email, phone FROM".$this->base_table." WHERE email = ? AND password = ? LIMIT 1");
+                    $sth = $this->database->db->prepare("SELECT id, name, email, phone, password FROM ".$this->base_table." WHERE email = ? LIMIT 1");
                     $sth->setFetchMode(PDO::FETCH_CLASS, 'User');
-                    $sth->execute(array($user->email, password_hash($user->password, PASSWORD_BCRYPT)));
+                    $sth->execute(array($user->email));
                     $fullUser = $sth->fetch();
+                    
                     if($fullUser){
-                        return new UserResponse($this->jwt->encode($fullUser), $fullUser);
+                        if(!password_verify($user->password, $fullUser->password)){
+                            http_response_code(401);
+                            return array("message" => "Неверный пароль");
+                        }
+                        unset($fullUser->password);
+                        return new UserResponse($this->jwt->encode($fullUser), $fullUser, "Вход выполнен");
                     } else {
                         http_response_code(400);
                         return array("message" => "Пользователь не найден");
@@ -80,20 +87,19 @@
                     "error" => $e->getMessage()
                 ));
             }
-
-            $user = $this->GetUserById($this->jwt->decode($token)['id']);
+            $user = $this->GetUserById($user->id);
 
             if($user){
-                return $user;
+                return new UserResponse($this->jwt->encode($user), $user, "Вход выполнен");
             } else {
                 http_response_code(400);
-                return array("message" => "Пользователь не найден");
+                return array("message" => "Ошибка входа");
             }
         }
 
         private function GetUserById(int $id){
             if($id){
-                $sth = $this->database->db->prepare("SELECT * FROM ".$this->base_table." WHERE id = ?");
+                $sth = $this->database->db->prepare("SELECT id, email, phone, name FROM ".$this->base_table." WHERE id = ?");
                 $sth->setFetchMode(PDO::FETCH_CLASS, 'User');
                 $sth->execute(array($id));
                 return $sth->fetch();
@@ -105,10 +111,10 @@
         }
 
         private function EmailExists(string $email){
-            $query = "SELECT id, email FROM " . $this->base_table . "WHERE email = ?";
+            $query = "SELECT id, email FROM " . $this->base_table . " WHERE email = ?";
  
             // подготовка запроса 
-            $stmt = $this->conn->prepare( $query );
+            $stmt = $this->database->db->prepare( $query );
             // инъекция 
             $email=htmlspecialchars(strip_tags($email));
             // выполняем запрос 
